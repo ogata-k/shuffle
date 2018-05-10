@@ -7,18 +7,15 @@ import System.Random
 import Data.List (nub, sortOn)
 import Control.Applicative ((<$>), (<*>))
 
-getNubRandomRs :: (Eq a, Enum a, RandomGen g) => g -> (a, a) -> [a]
-getNubRandomRs g (l, h) = map toEnum $ take (abs (hInt - lInt) + 1) $ nub $ randomRs (lInt, hInt) g
-    where
-        lInt = fromEnum l
-        hInt = fromEnum h
+getNubRandomRs :: RandomGen g => g -> (Int, Int) -> [Int]
+getNubRandomRs g (l, h) = take (abs (h - l) + 1) $ nub $ randomRs (l, h) g
 
-shuffle :: (Eq a, Enum a, RandomGen g) => g -> [a] -> [a]
+shuffle :: RandomGen g => g -> [a] -> [a]
 shuffle _ [] = []
 shuffle g xs = map fst $ sortOn snd $ zip xs rs
     where
         rs = getNubRandomRs g (1, length xs)
 
-autoShuffle :: (Eq a, Enum a) => [a] -> IO [a]
+autoShuffle ::[a] -> IO [a]
 autoShuffle [] = pure []
 autoShuffle xs = shuffle <$> newStdGen <*> (pure xs)
